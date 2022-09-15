@@ -1,2 +1,1 @@
-# examples
-Code Examples
+# Collection of Code Samples
