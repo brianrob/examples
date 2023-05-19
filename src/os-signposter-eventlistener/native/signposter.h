@@ -1,10 +1,3 @@
-//
-//  signposter.h
-//  signposterlib
-//
-//  Created by Brian Robbins on 5/16/23.
-//
-
 #ifndef signposter_h
 #define signposter_h
 
@@ -13,8 +6,10 @@
 os_log_t log_handle;
 os_signpost_id_t signpost_id;
 
-void init(void);
+void *create_log_handle(const char *subsystem_name);
 
-void emit_signpost(void);
+unsigned long generate_signpost_id(void *log_handle);
+
+void emit_signpost_event(void *log_handle, unsigned long signpost_id, const char *payload);
 
 #endif /* signposter_h */

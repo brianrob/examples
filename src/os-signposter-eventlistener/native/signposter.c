@@ -1,19 +1,16 @@
-//
-//  signposter.c
-//  signposterlib
-//
-//  Created by Brian Robbins on 5/16/23.
-//
-
 #include "signposter.h"
 
-void init(void)
+void *create_log_handle(const char *subsystem_name)
 {
-    log_handle = os_log_create("com.brianrob.signposter", OS_LOG_CATEGORY_POINTS_OF_INTEREST);
-    signpost_id = os_signpost_id_generate(log_handle);
+    return os_log_create(subsystem_name, OS_LOG_CATEGORY_POINTS_OF_INTEREST);
 }
 
-void emit_signpost(void)
+unsigned long generate_signpost_id(void *log_handle)
 {
-    os_signpost_event_emit(log_handle, signpost_id, "My Event 1", "Value: %s", "String");
+    return (unsigned long)os_signpost_id_generate(log_handle);
+}
+
+void emit_signpost_event(void *log_handle, unsigned long signpost_id, const char *payload)
+{
+    os_signpost_event_emit(log_handle, signpost_id, ".NET Event", "%s", payload);
 }
