@@ -12,5 +12,5 @@ unsigned long generate_signpost_id(void *log_handle)
 
 void emit_signpost_event(void *log_handle, unsigned long signpost_id, const char *payload)
 {
-    os_signpost_event_emit(log_handle, signpost_id, ".NET Event", "%s", payload);
+    os_signpost_event_emit(log_handle, signpost_id, "EventSource", "%{public}s", payload);
 }
