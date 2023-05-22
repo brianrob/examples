@@ -1,0 +1,11 @@
+HOWTO
+=====
+
+This project allows a user to inject an EventListener via a .NET startup hook and then emit EventSource events as signposts on OSX that can be consumed by Instruments during profiling.
+
+Follow these steps to use this project:
+1. Build the native component by switching to the native directory and running "make".  You can test the native component by running "make test" and then running "./test" while profiling with Instruments.
+2. Build the managed component by switching to the managed/signpost-forwarder directory and running "dotnet build -c Release".
+3. Copy libsignposter.dynlib to the output directory of the signpost-forwarder.
+4. Set the dotnet start-up hook by setting the environment variable DOTNET_STARTUP_HOOKS=/path/to/signpost-forwarder.dll
+5. Run your application while profiling with instruments.  The signposts should appear under the "Points of Interest" instrument.
