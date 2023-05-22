@@ -12,4 +12,8 @@ unsigned long generate_signpost_id(void *log_handle);
 
 void emit_signpost_event(void *log_handle, unsigned long signpost_id, const char *payload);
 
+void emit_signpost_start(void *log_handle, unsigned long signpost_id, const char *payload);
+
+void emit_signpost_stop(void *log_handle, unsigned long signpost_id, const char *payload);
+
 #endif /* signposter_h */

@@ -14,3 +14,13 @@ void emit_signpost_event(void *log_handle, unsigned long signpost_id, const char
 {
     os_signpost_event_emit(log_handle, signpost_id, "EventSource", "%{public}s", payload);
 }
+
+void emit_signpost_start(void *log_handle, unsigned long signpost_id, const char *payload)
+{
+    os_signpost_interval_begin(log_handle, signpost_id, "EventSourceInterval", "%{public}s", payload);
+}
+
+void emit_signpost_stop(void *log_handle, unsigned long signpost_id, const char *payload)
+{
+    os_signpost_interval_end(log_handle, signpost_id, "EventSourceInterval", "%{public}s", payload);
+}
