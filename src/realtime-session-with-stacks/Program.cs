@@ -118,10 +118,11 @@ namespace realtime_session_with_stacks
                 // You can do this synchronously by just removing the call to ResolveSymbolsForModule from the Task and calling synchronously.
                 if(string.IsNullOrEmpty(current.CodeAddress.FullMethodName) && !ResolvedSymbolsForModule(current.CodeAddress.ModuleFile))
                 {
-                    Task.Factory.StartNew(() =>
+                    Task.Factory.StartNew((o) =>
                     {
-                        ResolveSymbolsForModule(current.CodeAddress.CodeAddresses, current.CodeAddress.ModuleFile);
-                    });
+                        var localCurrent = (TraceCallStack)o;
+                        ResolveSymbolsForModule(localCurrent.CodeAddress.CodeAddresses, localCurrent.CodeAddress.ModuleFile);
+                    }, current);
                 }
 
                 Console.WriteLine($"[0x{current.CodeAddress.Address:X}] {current.CodeAddress.ModuleName}!{current.CodeAddress.FullMethodName}");
