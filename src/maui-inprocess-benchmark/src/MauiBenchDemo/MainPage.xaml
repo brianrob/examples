@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MauiBenchDemo.ViewModels"
+             x:Class="MauiBenchDemo.MainPage"
+             x:DataType="vm:MainViewModel"
+             Title="Home">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="18">
+
+            <Label Text="MAUI In-Process Benchmark Demo"
+                   Style="{StaticResource Headline}"
+                   SemanticProperties.HeadingLevel="Level1" />
+
+            <Label Text="A BenchmarkDotNet benchmark drives this live UI from inside the same process — no cross-process automation."
+                   Style="{StaticResource SubHeadline}" />
+
+            <Label Text="{Binding Message}" />
+            <Label Text="{Binding CounterText}" FontAttributes="Bold" />
+
+            <Button Text="Increment counter"
+                    Clicked="OnIncrementClicked"
+                    HorizontalOptions="Fill" />
+
+            <Button Text="Go to Items list"
+                    Clicked="OnItemsClicked"
+                    HorizontalOptions="Fill" />
+
+            <Button x:Name="RunBenchmarksButton"
+                    Text="Run UI benchmarks (in-process)"
+                    Clicked="OnRunBenchmarksClicked"
+                    HorizontalOptions="Fill" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

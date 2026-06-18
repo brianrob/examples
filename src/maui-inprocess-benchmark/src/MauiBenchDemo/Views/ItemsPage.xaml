@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MauiBenchDemo.ViewModels"
+             xmlns:models="clr-namespace:MauiBenchDemo.Models"
+             x:Class="MauiBenchDemo.Views.ItemsPage"
+             x:DataType="vm:ItemsViewModel"
+             Title="Items">
+
+    <Grid RowDefinitions="Auto,*" Padding="20" RowSpacing="12">
+
+        <HorizontalStackLayout Grid.Row="0" Spacing="10">
+            <Button Text="Add" Clicked="OnAddClicked" />
+            <Button Text="Remove" Clicked="OnRemoveClicked" />
+            <Button Text="Open first" Clicked="OnOpenFirstClicked" />
+        </HorizontalStackLayout>
+
+        <CollectionView Grid.Row="1"
+                        x:Name="ItemsCollectionView"
+                        ItemsSource="{Binding Items}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Item">
+                    <VerticalStackLayout Padding="6">
+                        <Label Text="{Binding Name}" FontAttributes="Bold" />
+                        <Label Text="{Binding Detail}" />
+                    </VerticalStackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
+
+</ContentPage>
