@@ -1,0 +1,121 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<!-- This example intentionally targets ONLY Windows (WinUI 3) and Mac Catalyst, the
+		     two desktop heads the diagnostics demo is verified against. Each OS builds its
+		     own head. Add net10.0-android / net10.0-ios here if you need them for your app. -->
+		<!-- DIAGNOSTICS SAMPLE — .NET 10 vs .NET 11 on Mac Catalyst.
+		     This head is committed targeting .NET 11, which runs the Mac Catalyst head on CoreCLR
+		     (see the UseMonoRuntime note below). To build for .NET 10 instead, change 'net11.0' to
+		     'net10.0' on BOTH lines below AND point global.json at a .NET 10 SDK. The
+		     TargetFramework-conditioned PropertyGroups further down apply the per-version
+		     diagnostics settings automatically. -->
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">net11.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('osx'))">net11.0-maccatalyst</TargetFrameworks>
+
+		<!-- Note for MacCatalyst:
+		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
+		When specifying both architectures, use the plural <RuntimeIdentifiers> instead of the singular <RuntimeIdentifier>.
+		The Mac App Store will NOT accept apps with ONLY maccatalyst-arm64 indicated;
+		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
+		<!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
+
+		<OutputType>Exe</OutputType>
+		<RootNamespace>ExampleApp</RootNamespace>
+		<UseMaui>true</UseMaui>
+		<SingleProject>true</SingleProject>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<!-- Enable XAML source generation for faster build times and improved performance.
+		     This generates C# code from XAML at compile time instead of runtime inflation.
+		     To disable, remove this line.
+		     For individual files, you can override by setting Inflator metadata:
+		       <MauiXaml Update="MyPage.xaml" Inflator="Default" /> (reverts to defaults: Runtime for Debug, XamlC for Release)
+		       <MauiXaml Update="MyPage.xaml" Inflator="Runtime" /> (force runtime inflation) -->
+		<MauiXamlInflator>SourceGen</MauiXamlInflator>
+
+		<!-- Display name -->
+		<ApplicationTitle>ExampleApp</ApplicationTitle>
+
+		<!-- App Identifier -->
+		<ApplicationId>com.companyname.exampleapp</ApplicationId>
+
+		<!-- Versions -->
+		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+		<ApplicationVersion>1</ApplicationVersion>
+
+		<!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
+		<WindowsPackageType>None</WindowsPackageType>
+
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
+		<!-- Mac Catalyst min OS differs by .NET version: the .NET 11 MacCatalyst SDK (26.2) requires
+		     >= 17.0; .NET 10 allows 15.0. -->
+		<SupportedOSPlatformVersion Condition="$(TargetFramework.StartsWith('net11')) And $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">17.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$(TargetFramework.StartsWith('net10')) And $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
+		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+		<ValidateXcodeVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">false</ValidateXcodeVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst' and '$(Configuration)' == 'Release'">
+		<EnableAssemblyILStripping>false</EnableAssemblyILStripping>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- App Icon -->
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+
+		<!-- Splash Screen -->
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+
+		<!-- Images -->
+		<MauiImage Include="Resources\Images\*" />
+		<MauiImage Update="Resources\Images\dotnet_bot.png" Resize="True" BaseSize="300,185" />
+		
+		<!-- Custom Fonts -->
+		<MauiFont Include="Resources\Fonts\*" />
+
+		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
+		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
+
+	<!-- ============================================================================================
+	     Mac Catalyst diagnostics configuration — the key difference between .NET 10 and .NET 11.
+
+	     On Mac Catalyst the managed runtime differs by .NET version:
+	       * .NET 10 and earlier  -> MonoVM   (EventPipe diagnostics are an opt-in static component)
+	       * .NET 11 and later     -> CoreCLR  (selected here via UseMonoRuntime=false)
+
+	     This sample is committed/verified on .NET 11 / CoreCLR, which has the EventPipe
+	     DiagnosticServer built in and starts it automatically (like desktop CoreCLR), so no opt-in
+	     is needed. Both this app's counters and System.Runtime counters stream out-of-process.
+
+	     Note: Mac Catalyst apps are sandboxed, so the EventPipe socket lives under the app's
+	     container TMPDIR and its full default-port path can exceed the 108-char UNIX socket limit.
+	     Out-of-process tools therefore attach via REVERSE-CONNECT using a short socket path
+	     (launch the app with DOTNET_DiagnosticPorts=<short path>; the tool hosts that socket).
+	     See the macOS section of docs/RUNNING.md.
+	     ============================================================================================ -->
+
+	<!-- .NET 11+ : CoreCLR. This is the configuration this sample is committed/verified against. -->
+	<PropertyGroup Condition="$(TargetFramework.StartsWith('net11')) And $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
+		<UseMonoRuntime>false</UseMonoRuntime>
+	</PropertyGroup>
+
+	<!-- .NET 10 : MonoVM. EnableDiagnostics=true statically links the Mono 'diagnostics_tracing'
+	     component (gated by this property in _ComputeMonoComponents, Xamarin.Shared.Sdk.targets);
+	     without it Mono links the stub and the app starts NO diagnostic socket, so nothing can
+	     attach at all. With it, counters stream out-of-process over reverse-connect. Build .NET 10
+	     with a .NET 10 SDK (update global.json) and the net10.0-* TargetFrameworks above. -->
+	<PropertyGroup Condition="$(TargetFramework.StartsWith('net10')) And $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
+		<EnableDiagnostics>true</EnableDiagnostics>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+	</ItemGroup>
+
+</Project>
