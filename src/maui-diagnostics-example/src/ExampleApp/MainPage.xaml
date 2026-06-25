@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ExampleApp.MainPage"
+             Title="Diagnostics example">
+
+    <Grid Padding="16" RowSpacing="12" RowDefinitions="Auto,Auto,Auto,*">
+
+        <VerticalStackLayout Grid.Row="0" Spacing="6">
+            <Label Text="Diagnostics example"
+                   FontSize="24"
+                   FontAttributes="Bold" />
+            <Label Text="Custom EventCounters (frame rate + thread-pool queue delay) plus the runtime's System.Runtime counters. Watch them in this in-process pane, or attach the CounterListener console over EventPipe using the PID below."
+                   FontSize="13" />
+            <Label x:Name="PidLabel"
+                   FontSize="14"
+                   FontAttributes="Bold" />
+            <Label x:Name="MetricsLabel"
+                   FontSize="16" />
+        </VerticalStackLayout>
+
+        <HorizontalStackLayout Grid.Row="1" Spacing="8">
+            <Button x:Name="RenderLoadBtn"
+                    Text="Add render load"
+                    Clicked="OnToggleRenderLoad" />
+            <Button Text="Induce thread-pool starvation"
+                    Clicked="OnInduceStarvation" />
+            <Button Text="Freeze UI (3s)"
+                    Clicked="OnFreezeUi" />
+        </HorizontalStackLayout>
+
+        <GraphicsView x:Name="FrameCanvas"
+                      Grid.Row="2"
+                      HeightRequest="110"
+                      Background="#F5F5FA" />
+
+        <Grid Grid.Row="3" RowDefinitions="*,*" RowSpacing="8">
+
+            <Border Grid.Row="0" Stroke="#DDDDDD" Padding="0">
+                <Grid RowDefinitions="Auto,*">
+                    <Label Grid.Row="0"
+                           Text="EventCounters — latest snapshot (replaced each interval)"
+                           FontSize="12"
+                           FontAttributes="Bold"
+                           Padding="8,4"
+                           BackgroundColor="#EEEEEE" />
+                    <ScrollView Grid.Row="1">
+                        <Label x:Name="CountersLabel"
+                               FontSize="12"
+                               FontFamily="Consolas"
+                               Padding="8,4" />
+                    </ScrollView>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="1" Stroke="#DDDDDD" Padding="0">
+                <Grid RowDefinitions="Auto,*">
+                    <Label Grid.Row="0"
+                           Text="Raw events — non-counter EventSource events"
+                           FontSize="12"
+                           FontAttributes="Bold"
+                           Padding="8,4"
+                           BackgroundColor="#EEEEEE" />
+                    <ScrollView x:Name="EventsScroll" Grid.Row="1">
+                        <Label x:Name="EventsLabel"
+                               FontSize="12"
+                               FontFamily="Consolas"
+                               Padding="8,4" />
+                    </ScrollView>
+                </Grid>
+            </Border>
+
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

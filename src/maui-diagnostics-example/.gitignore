@@ -1,0 +1,29 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+bld/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.userprefs
+
+# .NET
+project.lock.json
+*.binlog
+
+# MAUI / mobile
+*.keystore
+*.mobileprovision
+*.p12
+
+# OS
+.DS_Store
+Thumbs.db
